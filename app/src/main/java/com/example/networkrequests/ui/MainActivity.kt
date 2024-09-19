@@ -1,13 +1,27 @@
 package com.example.networkrequests.ui
 
+import android.content.Context
 import android.os.Bundle
+import android.view.Gravity
+import android.view.View
+import android.widget.LinearLayout
+import android.widget.PopupWindow
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelStore
+import androidx.lifecycle.viewmodel.ViewModelFactoryDsl
 import com.example.networkrequests.R
+import com.example.networkrequests.databinding.NetworkConnectivityPopupBinding
+import com.example.networkrequests.ui.utils.NetworkUtils
+import com.example.networkrequests.ui.viewmodels.ActivityViewModel
+import com.example.networkrequests.ui.viewmodels.ActivityViewModelFactory
 
 class MainActivity : AppCompatActivity() {
+
+    lateinit var viewModel :ActivityViewModel
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -17,6 +31,23 @@ class MainActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+        viewModel = ViewModelProvider(this,ActivityViewModelFactory(NetworkUtils.ConnectivityObserver(applicationContext))).get(ActivityViewModel::class.java)
+        viewModel.mutableConnectionStatus.observe(this){
+             showPopupWindow(findViewById(R.id.main),it.toString())
+        }
+    }
+
+    fun showPopupWindow( anchorview: View ,text:String){
+        val binding = NetworkConnectivityPopupBinding.inflate(layoutInflater)
+        binding.textView .text = text
+        val view = binding.root
+
+        val popupWindow = PopupWindow(view, LinearLayout.LayoutParams.WRAP_CONTENT,LinearLayout.LayoutParams.WRAP_CONTENT,true)
+        popupWindow.apply {
+
+        }
+        popupWindow.showAtLocation(view,Gravity.BOTTOM,30,anchorview.height+100)
+
     }
 }
 //In this project we will work with the network  on android

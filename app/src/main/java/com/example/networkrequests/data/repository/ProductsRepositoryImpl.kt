@@ -1,16 +1,15 @@
 package com.example.networkrequests.data.repository
 
-import com.example.networkrequests.data.Result
-import com.example.networkrequests.data.models.Product
-import com.example.networkrequests.data.models.ProductApiResult
-import com.example.networkrequests.data.remote.DummyJsonApi
+import com.example.networkrequests.data.sources.remote.Result
+import com.example.networkrequests.data.sources.remote.networkmodels.Product
+import com.example.networkrequests.data.sources.remote.networkmodels.ProductApiResult
+import com.example.networkrequests.data.sources.remote.services.DummyJsonApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import okhttp3.Dispatcher
 import okio.IOException
 import retrofit2.HttpException
 
-class ProductsRepositoryImpl( private val apiService :DummyJsonApi) :ProductsRepository {
+class ProductsRepositoryImpl( private val apiService : DummyJsonApi) :ProductsRepository {
     override suspend fun getAllProducts(): Result {
         return withContext(Dispatchers.IO) {
             try {
@@ -18,7 +17,33 @@ class ProductsRepositoryImpl( private val apiService :DummyJsonApi) :ProductsRep
             } catch (e: IOException) {
                 Result.Failure.NetworkFailure(e)
             } catch (e: HttpException) {
-                Result.Failure.ApiFailure(e.message())
+                Result.Failure.ApiFailure(e, e.message())
+            }
+
+        }
+    }
+
+    override suspend fun getProductById(id: Int): Result {
+        return withContext(Dispatchers.IO) {
+            try {
+                Result.Success<Product>(apiService.getProductById(id))
+            } catch (e: IOException) {
+                Result.Failure.NetworkFailure(e)
+            } catch (e: HttpException) {
+                Result.Failure.ApiFailure(e,e.message())
+            }
+
+        }
+    }
+
+    override suspend fun getProductsPaged(limit: Int, skip: Int): Result {
+        return withContext(Dispatchers.IO) {
+            try {
+                Result.Success<ProductApiResult>(apiService.getProductsByPagination(limit,skip))
+            } catch (e: IOException) {
+                Result.Failure.NetworkFailure(e)
+            } catch (e: HttpException) {
+                Result.Failure.ApiFailure(e,e.message())
             }
 
         }

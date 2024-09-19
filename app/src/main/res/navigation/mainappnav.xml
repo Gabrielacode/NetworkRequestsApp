@@ -2,10 +2,35 @@
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/mainappnav"
-    app:startDestination="@id/productsFragment">
+    app:startDestination="@id/bothRemoteAndCacheFragment">
 
     <fragment
         android:id="@+id/productsFragment"
-        android:name="com.example.networkrequests.ui.ProductsFragment"
-        android:label="ProductsFragment" />
+        android:name="com.example.networkrequests.ui.fragments.ProductsFragment"
+        android:label="ProductsFragment" >
+        <action
+            android:id="@+id/action_productsFragment_to_productItemFragment"
+            app:destination="@id/productItemFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/productItemFragment"
+        android:name="com.example.networkrequests.ui.fragments.ProductItemFragment"
+        android:label="ProductItemFragment"
+        >
+        <argument
+            android:name="Id"
+            app:argType="integer" />
+    </fragment>
+    <fragment
+        android:id="@+id/pagedProductsFragment"
+        android:name="com.example.networkrequests.ui.fragments.paginationExample.network.PagedProductsFragment"
+        android:label="PagedProductsFragment" />
+    <fragment
+        android:id="@+id/pagedItemsFragment"
+        android:name="com.example.networkrequests.ui.fragments.paginationExample.db.PagedItemsFragment"
+        android:label="PagedItemsFragment" />
+    <fragment
+        android:id="@+id/bothRemoteAndCacheFragment"
+        android:name="com.example.networkrequests.ui.fragments.paginationExample.both.BothRemoteAndCacheFragment"
+        android:label="BothRemoteAndCacheFragment" />
 </navigation>
