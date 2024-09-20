@@ -11,14 +11,13 @@ import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import java.net.Socket
+import javax.inject.Inject
 
-object NetworkUtils {
+class  NetworkUtils @Inject constructor() {
+    @Inject
     lateinit var connectivityManager: ConnectivityManager
 
-    fun initManager(context: Context){
-        connectivityManager = context.getSystemService( Context.CONNECTIVITY_SERVICE) as ConnectivityManager
 
-    }
    fun hasActiveNetwork ():Boolean {
        val activeNetwork = connectivityManager.activeNetwork //Returns the Active Network
        //Check whether the network is connected
@@ -26,8 +25,9 @@ object NetworkUtils {
 
        return activeNetwork!=null
    }
-     class ConnectivityObserver( private val context: Context){
-        private val manager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+     class ConnectivityObserver @Inject constructor ( ){
+     @Inject
+      lateinit var connectivityManager :ConnectivityManager
         fun observe(): Flow<ConnectivityStatus>{
          return callbackFlow {
              val callback = object : ConnectivityManager.NetworkCallback() {

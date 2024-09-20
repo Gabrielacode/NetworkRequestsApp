@@ -10,8 +10,9 @@ import com.example.networkrequests.data.sources.database.db.SimpleDummyDatabase
 import com.example.networkrequests.data.sources.database.entities.pageddbmodels.SimplifiedDummyItem
 import com.example.networkrequests.data.sources.remote.services.DummyJsonApi
 import com.example.networkrequests.data.sources.remote.services.SortOrder
+import javax.inject.Inject
 
-class PagedProductsFromNetworkAndCache @OptIn(ExperimentalPagingApi::class) constructor(
+class PagedProductsFromNetworkAndCache @OptIn(ExperimentalPagingApi::class) @Inject constructor(
     val db:SimpleDummyDatabase,
     val apiService:DummyJsonApi,
     ) {

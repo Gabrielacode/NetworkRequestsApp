@@ -12,6 +12,7 @@ import android.widget.PopupWindow
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.paging.LoadState
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -20,21 +21,60 @@ import com.example.networkrequests.data.sources.database.db.SimpleDummyDatabase
 import com.example.networkrequests.data.sources.remote.RetrofitInstance
 import com.example.networkrequests.databinding.DropdownBoxBinding
 import com.example.networkrequests.databinding.ProductLayoutBinding
+import com.example.networkrequests.ui.ApplicationComponent
+import com.example.networkrequests.ui.MainApp
 import com.example.networkrequests.ui.adapters.BothCacheAndNetworkAdapter
 import com.example.networkrequests.ui.adapters.PagedLoadStateAdapter
 import com.example.networkrequests.ui.adapters.PagedProductListAdapter
 import com.example.networkrequests.ui.viewmodels.PagedNetworkAndCacheViewModel
 import com.example.networkrequests.ui.viewmodels.PagedNetworkAndCacheViewModelFactory
+import dagger.BindsInstance
+import dagger.Module
+import dagger.Provides
+import dagger.Subcomponent
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import javax.inject.Inject
+
+//We will now do  a sub component for the for the Fragment
+@Subcomponent
+interface BothRemoteAndCacheFragmentComponent{
+     fun inject(fragment: Fragment)
+    @Subcomponent.Builder
+    interface Builder{
+        @BindsInstance
+        fun provideFragment(fragment: Fragment):Builder
+        fun build():BothRemoteAndCacheFragmentComponent
+    }
+}
+
+//Our Fragment Module
+@Module
+class FragmentModule{
+
+    @Provides
+    fun providesPagedAdapter():BothCacheAndNetworkAdapter = BothCacheAndNetworkAdapter()
+    @Provides
+    fun providesViewModel(fragment: Fragment,repo:PagedProductsFromNetworkAndCache):PagedNetworkAndCacheViewModel{
+        return ViewModelProvider(fragment,PagedNetworkAndCacheViewModelFactory(repo)).get(PagedNetworkAndCacheViewModel::class.java)
+    }
+}
 
 class BothRemoteAndCacheFragment:Fragment() {
-    val viewModel :PagedNetworkAndCacheViewModel by viewModels<PagedNetworkAndCacheViewModel>
-    { PagedNetworkAndCacheViewModelFactory(PagedProductsFromNetworkAndCache(SimpleDummyDatabase.getInstance(requireContext().applicationContext),RetrofitInstance.productApiService!!))  }
+    @Inject
+    lateinit var viewModel: PagedNetworkAndCacheViewModel
     lateinit var binding: ProductLayoutBinding
-    val pagedadapter = BothCacheAndNetworkAdapter()
+
+   lateinit var pagedadapter :BothCacheAndNetworkAdapter
     var popup :PopupWindow?=null
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        val fragmentComponent = (requireActivity().application as MainApp).appComponent.bothCacheAndRemoteBuilder().provideFragment(this).build()
+        fragmentComponent.inject(this)
+        pagedadapter = BothCacheAndNetworkAdapter()
+    }
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,

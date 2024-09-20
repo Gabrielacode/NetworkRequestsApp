@@ -10,12 +10,12 @@ import androidx.lifecycle.viewmodel.CreationExtras
 import com.example.networkrequests.ui.utils.NetworkUtils
 import kotlinx.coroutines.launch
 
-class ActivityViewModel( connectivityObserver: NetworkUtils.ConnectivityObserver) : ViewModel() {
- var connectivityObserver : NetworkUtils.ConnectivityObserver
+class ActivityViewModel( val connectivityObserver: NetworkUtils.ConnectivityObserver) : ViewModel() {
+
  val mutableConnectionStatus = MutableLiveData<NetworkUtils.ConnectivityStatus>()
 
  init {
-     this.connectivityObserver = connectivityObserver
+
     viewModelScope.launch {
         connectivityObserver.observe().collect{
          mutableConnectionStatus.value = it

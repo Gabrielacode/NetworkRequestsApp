@@ -18,9 +18,39 @@ import com.example.networkrequests.databinding.NetworkConnectivityPopupBinding
 import com.example.networkrequests.ui.utils.NetworkUtils
 import com.example.networkrequests.ui.viewmodels.ActivityViewModel
 import com.example.networkrequests.ui.viewmodels.ActivityViewModelFactory
+import dagger.BindsInstance
+import dagger.Module
+import dagger.Provides
+import dagger.Subcomponent
+import javax.inject.Inject
 
+//Now let us create our activity component
+//It will be a sub component of our application component since it needs  to the Network Utils
+
+@Subcomponent(modules = [MainActivityModule::class])
+interface MainActivityComponent{
+
+    fun injectMainActivity(activity: MainActivity)
+    @Subcomponent.Builder
+    interface Builder{
+        @BindsInstance
+        fun getActivity(activity: MainActivity):Builder
+         fun build():MainActivityComponent
+    }
+}
+//Our Module
+
+@Module
+class MainActivityModule{
+
+    @Provides
+    fun providesActivityViewModel( activity: MainActivity,connectivityObserver: NetworkUtils.ConnectivityObserver):ActivityViewModel{
+        return ViewModelProvider(activity,ActivityViewModelFactory(connectivityObserver)).get(ActivityViewModel::class.java)
+    }
+}
 class MainActivity : AppCompatActivity() {
 
+    @Inject
     lateinit var viewModel :ActivityViewModel
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,7 +61,10 @@ class MainActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
-        viewModel = ViewModelProvider(this,ActivityViewModelFactory(NetworkUtils.ConnectivityObserver(applicationContext))).get(ActivityViewModel::class.java)
+          val mainActivityComponent = (application as MainApp).appComponent.mainActivityBuilder().getActivity(this).build()
+          mainActivityComponent.injectMainActivity(this)
+     //   viewModel = ViewModelProvider(this,ActivityViewModelFactory(NetworkUtils.ConnectivityObserver(applicationContext))).get(ActivityViewModel::class.java)
+        //We then remove this
         viewModel.mutableConnectionStatus.observe(this){
              showPopupWindow(findViewById(R.id.main),it.toString())
         }

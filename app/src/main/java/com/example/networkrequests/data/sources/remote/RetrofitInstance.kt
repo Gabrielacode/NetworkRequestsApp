@@ -19,6 +19,7 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import java.io.File
 import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 
 object RetrofitInstance {
     const val cacheFileDir = "HTTP_CACHE"
@@ -33,7 +34,7 @@ object RetrofitInstance {
         return Cache(File(context.cacheDir, cacheFileDir), (20 * 1024 * 1024).toLong())
     }
 
-    fun initializeRetrofit(context: Context) {
+    fun initializeRetrofit(context: Context):Retrofit {
         val json = Json {
             ignoreUnknownKeys = true
         } //Here we ignore any unknown properties instead of throwing a serialization exception
@@ -98,9 +99,11 @@ object RetrofitInstance {
 
         }
         val forceCacheInterceptor=object :Interceptor{
+            @Inject
+            lateinit var networkUtils: NetworkUtils
             override fun intercept(chain: Interceptor.Chain): Response {
                 var request = chain.request()
-                if(!NetworkUtils.hasActiveNetwork()){
+                if(!networkUtils.hasActiveNetwork()){
                     request  =  request.newBuilder()
                         .addHeader("Cache-Control", CacheControl.FORCE_CACHE.toString())
                         .build()
@@ -130,13 +133,12 @@ object RetrofitInstance {
              })
             .build()
 
-         val retrofitInstace = Retrofit.Builder()
+     return  Retrofit.Builder()
             .addConverterFactory(converterFactor)
             .baseUrl(HttpRoutes.BASE_URL)
             .client(client)
             .build()
 
-        productApiService = retrofitInstace.create(DummyJsonApi::class.java)
     }
 }
 

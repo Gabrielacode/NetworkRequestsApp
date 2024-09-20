@@ -16,6 +16,7 @@ import com.example.networkrequests.databinding.ProductItemLayoutBinding
 import com.example.networkrequests.databinding.SeperatorItemBinding
 import com.example.networkrequests.domain.model.DummyModel
 import com.example.networkrequests.ui.viewmodels.UserModel
+import javax.inject.Inject
 
 val SimplifiedDummyItemDiffUtil = object : DiffUtil.ItemCallback<UserModel>(){
     override fun areItemsTheSame(oldItem: UserModel, newItem: UserModel): Boolean {
@@ -33,7 +34,7 @@ val SimplifiedDummyItemDiffUtil = object : DiffUtil.ItemCallback<UserModel>(){
     }
 
 }
-class BothCacheAndNetworkAdapter() :PagingDataAdapter<UserModel,RecyclerView.ViewHolder>(SimplifiedDummyItemDiffUtil){
+class BothCacheAndNetworkAdapter @Inject constructor() :PagingDataAdapter<UserModel,RecyclerView.ViewHolder>(SimplifiedDummyItemDiffUtil){
 
     inner class ProductViewHolder( val binding : ProductItemLayoutBinding): RecyclerView.ViewHolder(binding.root){
         fun bind (value: UserModel.UIModel?){

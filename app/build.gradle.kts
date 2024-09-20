@@ -92,7 +92,9 @@ dependencies {
     implementation("androidx.room:room-ktx:$room_version")
 
     //Dagger
-
+    val dagger_version = "2.46"
+    implementation ("com.google.dagger:dagger:$dagger_version")
+    kapt ("com.google.dagger:dagger-compiler:$dagger_version")
 
 }
 
