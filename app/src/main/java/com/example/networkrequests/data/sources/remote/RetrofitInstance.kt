@@ -30,11 +30,12 @@ object RetrofitInstance {
     var productApiService: DummyJsonApi? = null
 
 
+
     fun setCache(context: Context):Cache {
         return Cache(File(context.cacheDir, cacheFileDir), (20 * 1024 * 1024).toLong())
     }
 
-    fun initializeRetrofit(context: Context):Retrofit {
+    fun initializeRetrofit(context: Context, networkUtils:NetworkUtils):Retrofit {
         val json = Json {
             ignoreUnknownKeys = true
         } //Here we ignore any unknown properties instead of throwing a serialization exception
@@ -99,8 +100,7 @@ object RetrofitInstance {
 
         }
         val forceCacheInterceptor=object :Interceptor{
-            @Inject
-            lateinit var networkUtils: NetworkUtils
+
             override fun intercept(chain: Interceptor.Chain): Response {
                 var request = chain.request()
                 if(!networkUtils.hasActiveNetwork()){

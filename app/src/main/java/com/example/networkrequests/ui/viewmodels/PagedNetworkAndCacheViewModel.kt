@@ -11,12 +11,15 @@ import com.example.networkrequests.data.repository.PagedProductsFromNetworkAndCa
 import com.example.networkrequests.data.sources.mappers.toDummyModel
 import com.example.networkrequests.data.sources.remote.services.SortOrder
 import com.example.networkrequests.domain.model.DummyModel
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.retry
+import javax.inject.Inject
 
-class PagedNetworkAndCacheViewModel(val repo:PagedProductsFromNetworkAndCache) :ViewModel() {
+@HiltViewModel
+class PagedNetworkAndCacheViewModel @Inject constructor(val repo:PagedProductsFromNetworkAndCache) :ViewModel() {
    val dummyItemsPagedFlow = repo.getList()
        .map { it.map {
            it.toDummyModel()

@@ -7,6 +7,7 @@ import android.view.View
 import android.widget.LinearLayout
 import android.widget.PopupWindow
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -17,41 +18,35 @@ import com.example.networkrequests.R
 import com.example.networkrequests.databinding.NetworkConnectivityPopupBinding
 import com.example.networkrequests.ui.utils.NetworkUtils
 import com.example.networkrequests.ui.viewmodels.ActivityViewModel
-import com.example.networkrequests.ui.viewmodels.ActivityViewModelFactory
+
 import dagger.BindsInstance
 import dagger.Module
 import dagger.Provides
 import dagger.Subcomponent
+import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 //Now let us create our activity component
 //It will be a sub component of our application component since it needs  to the Network Utils
 
-@Subcomponent(modules = [MainActivityModule::class])
-interface MainActivityComponent{
+//@Subcomponent(modules = [MainActivityModule::class])
+//interface MainActivityComponent{
+//
+//    fun injectMainActivity(activity: MainActivity)
+//    @Subcomponent.Builder
+//    interface Builder{
+//        @BindsInstance
+//        fun getActivity(activity: MainActivity):Builder
+//         fun build():MainActivityComponent
+//    }
+//}
+////Our Module
 
-    fun injectMainActivity(activity: MainActivity)
-    @Subcomponent.Builder
-    interface Builder{
-        @BindsInstance
-        fun getActivity(activity: MainActivity):Builder
-         fun build():MainActivityComponent
-    }
-}
-//Our Module
-
-@Module
-class MainActivityModule{
-
-    @Provides
-    fun providesActivityViewModel( activity: MainActivity,connectivityObserver: NetworkUtils.ConnectivityObserver):ActivityViewModel{
-        return ViewModelProvider(activity,ActivityViewModelFactory(connectivityObserver)).get(ActivityViewModel::class.java)
-    }
-}
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
-    @Inject
-    lateinit var viewModel :ActivityViewModel
+
+     val viewModel :ActivityViewModel by viewModels<ActivityViewModel> ()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -61,8 +56,7 @@ class MainActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
-          val mainActivityComponent = (application as MainApp).appComponent.mainActivityBuilder().getActivity(this).build()
-          mainActivityComponent.injectMainActivity(this)
+
      //   viewModel = ViewModelProvider(this,ActivityViewModelFactory(NetworkUtils.ConnectivityObserver(applicationContext))).get(ActivityViewModel::class.java)
         //We then remove this
         viewModel.mutableConnectionStatus.observe(this){

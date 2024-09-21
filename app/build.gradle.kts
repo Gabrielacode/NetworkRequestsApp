@@ -3,6 +3,8 @@ plugins {
     alias(libs.plugins.jetbrains.kotlin.android)
     kotlin("plugin.serialization") version "2.0.20"
     id ("kotlin-kapt")
+    id("com.google.dagger.hilt.android")
+
 
 }
 
@@ -95,6 +97,12 @@ dependencies {
     val dagger_version = "2.46"
     implementation ("com.google.dagger:dagger:$dagger_version")
     kapt ("com.google.dagger:dagger-compiler:$dagger_version")
+    //Dagger Hilt
+    implementation("com.google.dagger:hilt-android:$dagger_version")
+    kapt("com.google.dagger:hilt-android-compiler:$dagger_version")
 
+}
+kapt{
+    correctErrorTypes = true
 }
 
